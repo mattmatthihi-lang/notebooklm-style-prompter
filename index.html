@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NotebookLM Style Library</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- React and Babel for running JSX in browser -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #FFFDF9; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo, useEffect } = React;
+
+        // Simplified Icon Component for Browser Usage
+        const Icon = ({ name, size = 20, className = "" }) => {
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            }, [name]);
+            return <i data-lucide={name} className={className} style={{ width: size, height: size }}></i>;
+        };
+
+        const I18N = {
+            en: {
+                title: "Style Library",
+                subtitle: "NotebookLM Design Engine",
+                description: "A curated library of precise design specifications. Feed these prompts into NotebookLM to generate structured, visually cohesive document layouts.",
+                slideDeck: "Slide Deck",
+                infographic: "Infographic",
+                searchPlaceholder: "Search styles...",
+                step1: "1. Format",
+                step2: "2. Topic",
+                setActiveTopic: "Set Active Topic",
+                topicActive: "Topic Active",
+                clear: "CLEAR",
+                topicInputPlaceholder: (mode) => `Type topic for your ${mode}...`,
+                promptOutput: "Spec Output",
+                copyBtn: (mode) => `COPY ${mode.toUpperCase()} PROMPT`,
+                copied: "COPIED!",
+                patterns: "20+ Patterns",
+                quality: "High-Fidelity Prompting",
+                support: "Buy me a coffee",
+                footer: "NotebookLM Design Spec Library",
+                langToggle: "繁體中文",
+                stylesCount: "Styles"
+            },
+            zh: {
+                title: "風格庫",
+                subtitle: "NotebookLM 設計引擎",
+                description: "精心策劃的精確設計規格庫。將這些提示詞輸入 NotebookLM，即可產生結構化且視覺一致的排版草案。",
+                slideDeck: "簡報方案",
+                infographic: "資訊圖表",
+                searchPlaceholder: "搜尋風格...",
+                step1: "1. 格式",
+                step2: "2. 主題",
+                setActiveTopic: "設定目前主題",
+                topicActive: "主題已啟用",
+                clear: "清除",
+                topicInputPlaceholder: (mode) => `請輸入您的${mode === "infographic" ? "資訊圖表" : "簡報"}主題...`,
+                promptOutput: "規格輸出",
+                copyBtn: (mode) => `複製${mode === "infographic" ? "資訊圖表" : "簡報"}提示詞`,
+                copied: "已複製！",
+                patterns: "20+ 種樣式",
+                quality: "高擬真提示詞",
+                support: "贊助我一杯咖啡",
+                footer: "NotebookLM 設計規格庫",
+                langToggle: "English",
+                stylesCount: "種風格"
+            }
+        };
+
+        const VISUAL_STYLES = [
+            { name: "Kawaii Pastel", nameZh: "可愛粉彩", concept: "Soft Comfort", conceptZh: "柔和舒適", vibe: "Cute, bubbly, friendly, soft", vibeZh: "可愛、活潑、友善、柔軟", bg: "#FFF0F5", accent: "#FFB6C1", typo: "Rounded Sans", elements: "Floating sparkles", elementsZh: "漂浮閃爍元素" },
+            { name: "90s Cartoon", nameZh: "90年代卡通", concept: "Zany Energy", conceptZh: "滑稽活力", vibe: "High-contrast, playful", vibeZh: "高對比、俏皮", bg: "#FFFFFF", accent: "#00FF00", typo: "Bangers", elements: "Checkerboard", elementsZh: "棋盤格" },
+            { name: "Studio Ghibli", nameZh: "吉卜力風", concept: "Hand-painted", conceptZh: "手繪奇幻", vibe: "Dreamy, organic", vibeZh: "夢幻、有機", bg: "#E8F5E9", accent: "#4CAF50", typo: "Classic Serif", elements: "Watercolor", elementsZh: "水彩紋理" },
+            { name: "Claymation 3D", nameZh: "3D 黏土", concept: "Tactile Play", conceptZh: "觸感趣味", vibe: "Handmade, chunky", vibeZh: "手工感、厚實", bg: "#FDF5E6", accent: "#FF4500", typo: "Bold Rounded", elements: "Fingerprints", elementsZh: "指紋紋理" },
+            { name: "Swiss Brutalism", nameZh: "瑞士粗獷", concept: "Raw Function", conceptZh: "原始功能", vibe: "Bold, industrial", vibeZh: "大膽、工業風", bg: "#A9A9A9", accent: "#FF4F00", typo: "Heavy Sans", elements: "Blocky grids", elementsZh: "塊狀網格" },
+            { name: "Cyber-Zen", nameZh: "賽博禪意", concept: "Digital Peace", conceptZh: "數位寧靜", vibe: "Clean, ethereal", vibeZh: "乾淨、空靈", bg: "#0A0E14", accent: "#00F3FF", typo: "Thin Inter", elements: "Glassmorphism", elementsZh: "玻璃擬態" },
+            { name: "Japanese Stationery", nameZh: "日式文具", concept: "Zen Precision", conceptZh: "禪意精準", vibe: "Minimal, calm", vibeZh: "極簡、冷靜", bg: "#F9F9F9", accent: "#00416A", typo: "Mincho Serif", elements: "Hanko stamps", elementsZh: "印章元素" },
+            { name: "Luxury Noir", nameZh: "奢華魅影", concept: "Prestige", conceptZh: "聲望策略", vibe: "Elegant, premium", vibeZh: "優雅、高級感", bg: "#1A1A1A", accent: "#D4AF37", typo: "Playfair Serif", elements: "Gold foil", elementsZh: "金箔線條" },
+            { name: "Bauhaus", nameZh: "包浩斯", concept: "Revival", conceptZh: "形隨機能", vibe: "Geometric, retro", vibeZh: "幾何、復古", bg: "#F4F1EA", accent: "#FF0000", typo: "Futura", elements: "Color blocking", elementsZh: "原色色塊" },
+            { name: "Terminal", nameZh: "終端機", concept: "Underground", conceptZh: "地下情報", vibe: "Retro-hacker", vibeZh: "復古計算", bg: "#000000", accent: "#00FF41", typo: "Monospace", elements: "ASCII Art", elementsZh: "ASCII 藝術" }
+        ];
+
+        function App() {
+            const [lang, setLang] = useState('zh');
+            const [formatMode, setFormatMode] = useState('slideDeck');
+            const [searchQuery, setSearchQuery] = useState('');
+            const [topic, setTopic] = useState('');
+            const [topicActive, setTopicActive] = useState(false);
+            const [copiedId, setCopiedId] = useState(null);
+
+            const t = I18N[lang];
+
+            const filteredStyles = useMemo(() => {
+                return VISUAL_STYLES.filter(style => {
+                    const searchTerms = searchQuery.toLowerCase();
+                    const name = lang === 'en' ? style.name : style.nameZh;
+                    return name.toLowerCase().includes(searchTerms);
+                });
+            }, [searchQuery, lang]);
+
+            const handleCopy = (text, idx) => {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                setCopiedId(idx);
+                setTimeout(() => setCopiedId(null), 2000);
+            };
+
+            const generatePrompt = (style) => {
+                const baseSubject = topicActive && topic.trim() !== '' 
+                    ? (lang === 'en' ? `Subject: [${topic}]` : `主題: [${topic}]`)
+                    : (lang === 'en' ? `Subject: [Your Topic]` : `主題: [您的主題]`);
+                
+                if (lang === 'zh') {
+                    return `【NotebookLM 設計規格】\n${baseSubject}\n風格: ${style.nameZh}\n氛圍: ${style.vibeZh}\n配色: 背景 ${style.bg}, 點綴 ${style.accent}\n元素: ${style.elementsZh}\n指令: 請針對此風格生成${formatMode === 'slideDeck' ? '簡報大綱' : '資訊圖表流程'}。`;
+                }
+                return `[NotebookLM Design Spec]\n${baseSubject}\nStyle: ${style.name}\nVibe: ${style.vibe}\nPalette: BG ${style.bg}, Accent ${style.accent}\nElements: ${style.elements}\nTask: Generate a ${formatMode} using this style.`;
+            };
+
+            return (
+                <div className="min-h-screen pb-24 px-4">
+                    <nav className="sticky top-0 z-50 bg-[#FFFDF9]/80 backdrop-blur-md border-b-4 border-black py-4 flex justify-between items-center mb-8">
+                        <div className="flex items-center gap-2">
+                            <div className="bg-black text-white p-1"><Icon name="zap" size={20} /></div>
+                            <span className="font-black text-xl uppercase tracking-tighter">{t.title}</span>
+                        </div>
+                        <button onClick={() => setLang(lang === 'en' ? 'zh' : 'en')} className="border-2 border-black px-4 py-1 text-xs font-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] uppercase bg-white">
+                            {t.langToggle}
+                        </button>
+                    </nav>
+
+                    <div className="max-w-[1400px] mx-auto">
+                        <header className="mb-10">
+                            <h1 className="text-5xl lg:text-7xl font-black uppercase leading-none mb-4">{t.subtitle}</h1>
+                            <p className="max-w-2xl font-bold border-l-4 border-black pl-4 text-stone-600">{t.description}</p>
+                        </header>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 bg-white border-4 border-black p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] mb-12">
+                            <div>
+                                <label className="block text-[10px] font-black uppercase mb-2 tracking-widest">{t.step1}</label>
+                                <div className="flex gap-2">
+                                    <button onClick={() => setFormatMode('slideDeck')} className={`flex-1 py-3 border-2 border-black font-black uppercase ${formatMode === 'slideDeck' ? 'bg-black text-white' : 'bg-white'}`}>{t.slideDeck}</button>
+                                    <button onClick={() => setFormatMode('infographic')} className={`flex-1 py-3 border-2 border-black font-black uppercase ${formatMode === 'infographic' ? 'bg-black text-white' : 'bg-white'}`}>{t.infographic}</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-[10px] font-black uppercase mb-2 tracking-widest">{t.step2}</label>
+                                <div className="flex gap-2">
+                                    <input value={topic} onChange={e => setTopic(e.target.value)} placeholder={t.topicInputPlaceholder(formatMode)} className="flex-1 border-2 border-black px-4 font-bold outline-none" />
+                                    <button onClick={() => setTopicActive(!topicActive)} className={`px-6 py-3 border-2 border-black font-black uppercase ${topicActive ? 'bg-red-500 text-white' : 'bg-[#DFFF00]'}`}>{topicActive ? t.clear : t.setActiveTopic}</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col md:flex-row gap-4 justify-between items-center mb-10">
+                            <div className="relative w-full md:w-96">
+                                <input placeholder={t.searchPlaceholder} onChange={e => setSearchQuery(e.target.value)} className="w-full border-2 border-black p-3 pl-10 font-bold shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]" />
+                                <div className="absolute left-3 top-4"><Icon name="search" size={18} /></div>
+                            </div>
+                            <div className="bg-black text-white px-4 py-2 font-black text-xs uppercase">{filteredStyles.length} {t.stylesCount}</div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                            {filteredStyles.map((style, idx) => {
+                                const p = generatePrompt(style);
+                                return (
+                                    <div key={idx} className="bg-white border-4 border-black rounded-xl overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all flex flex-col">
+                                        <div className="h-24 border-b-2 border-black" style={{ backgroundColor: style.bg }}></div>
+                                        <div className="p-5 flex-1 flex flex-col">
+                                            <h3 className="font-black uppercase text-lg mb-1">{lang === 'zh' ? style.nameZh : style.name}</h3>
+                                            <p className="text-xs font-bold text-stone-500 mb-4">{lang === 'zh' ? style.vibeZh : style.vibe}</p>
+                                            <div className="bg-stone-50 border-2 border-stone-200 p-2 text-[10px] font-mono mb-4 h-20 overflow-y-auto scrollbar-hide">{p}</div>
+                                            <button onClick={() => handleCopy(p, idx)} className={`w-full py-3 border-2 border-black font-black text-xs uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] ${copiedId === idx ? 'bg-green-400' : 'bg-[#DFFF00]'}`}>
+                                                {copiedId === idx ? t.copied : t.copyBtn(formatMode)}
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
