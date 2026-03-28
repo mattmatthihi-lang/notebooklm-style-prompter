@@ -163,9 +163,18 @@
                     : (lang === 'en' ? `Subject: [Your Topic]` : `主題: [您的主題]`);
                 
                 if (lang === 'zh') {
-                    return `【NotebookLM 設計規格】\n${baseSubject}\n風格: ${style.nameZh}\n氛圍: ${style.vibeZh}\n配色: 背景 ${style.bg}, 點綴 ${style.accent}\n元素: ${style.elementsZh}\n指令: 請針對此風格生成${formatMode === 'slideDeck' ? '簡報大綱' : '資訊圖表流程'}。`;
+                    const task = formatMode === 'slideDeck'
+                        ? `指令: 請針對此風格生成簡報大綱。\n※ 重要要求：請為「每張投影片」提供詳細的「視覺排版描述」、「圖像提示詞 (Image Prompts)」以及「圖形與圖表配置建議」，確保充分展現此視覺風格的特色。`
+                        : `指令: 請針對此風格生成資訊圖表流程。\n※ 重要要求：請詳細描述每個資料區塊的視覺元素、圖示建議和空間排版結構。`;
+                    
+                    return `【NotebookLM 設計規格】\n${baseSubject}\n風格: ${style.nameZh}\n氛圍: ${style.vibeZh}\n配色: 背景 ${style.bg}, 點綴 ${style.accent}\n元素: ${style.elementsZh}\n${task}`;
+                } else {
+                    const task = formatMode === 'slideDeck'
+                        ? `Task: Generate a slide deck outline using this style.\n*CRITICAL: For each slide, you MUST provide detailed "Visual Layout Descriptions", "Image Prompts", and "Graphic/Chart Placement Suggestions" to fully showcase this specific visual style.`
+                        : `Task: Generate an infographic flow using this style.\n*CRITICAL: Detail the visual elements, icon suggestions, and layout structure for each data section.`;
+                        
+                    return `[NotebookLM Design Spec]\n${baseSubject}\nStyle: ${style.name}\nVibe: ${style.vibe}\nPalette: BG ${style.bg}, Accent ${style.accent}\nElements: ${style.elements}\n${task}`;
                 }
-                return `[NotebookLM Design Spec]\n${baseSubject}\nStyle: ${style.name}\nVibe: ${style.vibe}\nPalette: BG ${style.bg}, Accent ${style.accent}\nElements: ${style.elements}\nTask: Generate a ${formatMode} using this style.`;
             };
 
             return (
